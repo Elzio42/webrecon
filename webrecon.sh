@@ -1,7 +1,7 @@
 #!/bin/bash
 
-declare -a diretorios
-declare -a arquivos
+declare -a Diretorios
+declare -a Arquivos
 
 nc='\033[0m'
 red='\033[0;31m'
@@ -10,14 +10,8 @@ blue='\033[0;34m'
 
 
 exibir_resultado () {
-if [ "$2" == "arquivos" ]
-then
-  declare -n var=$2 # '-n' faz da variável um ponteiro para outra variável.
-  printf "${blue}\nArquivos encontrados${nc}\n"
-else
-  declare -n var=$2 
-  printf "${blue}\nDiretórios encontrados${nc}\n"
-fi
+declare -n var=$2 # '-n' faz da variável um ponteiro para outra variável.
+printf "${blue}\n$2 encontrados${nc}\n"
 
 for i in "${var[@]}"
 do
@@ -33,21 +27,25 @@ arquivo=$(curl -s -H "User-Agent: elzio" -o /dev/null -w "%{http_code}" http://$
 
 if [ $diretorio == "200" ]
 then
-  diretorios+=($palavra)
+  Diretorios+=($palavra)
 fi
 
 if [ $arquivo == "200" ]
 then
-  arquivos+=($palavra.$2)
+  Arquivos+=($palavra.$2)
 fi
 done
 
-if [ ! -z "$diretorios" ]
+if [ ! -z "$Diretorios" ]
 then
-  exibir_resultado $1 diretorios
+  exibir_resultado $1 Diretorios
+else
+  printf "${red}\nNenhum diretório encontrado para esse dominio${nc}\n"
 fi
 
-if [ ! -z "$arquivos" ]
+if [ ! -z "$Arquivos" ]
 then
-  exibir_resultado $1 arquivos
+  exibir_resultado $1 Arquivos
+else
+  printf "${red}\nNenhum arquivo encontrado para esse dominio${nc}\n"
 fi
