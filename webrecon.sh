@@ -10,7 +10,7 @@ blue='\033[0;34m'
 vard=0
 vara=0
 
-exibir_resultado () {
+exibir_resultado() {
 declare -n var=$2 # '-n' faz da variável um ponteiro para outra variável.
 printf "${blue}\n\nLista de $2${nc}\n"
 
@@ -20,32 +20,61 @@ do
 done
 }
 
-
-for palavra in $(cat claudio.txt)
-do
-  echo -en "\r${green}Diretórios encontrados:${nc} ${red}$vard${nc} ${green}Arquivos encontrados:${nc} ${red}$vara${nc}"
-  diretorio=$(curl -s -H "User-Agent: elzio" -o /dev/null -w "%{http_code}" http://$1/$palavra/)
-  arquivo=$(curl -s -H "User-Agent: elzio" -o /dev/null -w "%{http_code}" http://$1/$palavra.$2)
-
-  if [ $diretorio == "200" ]
+inserindo_diretorios() {
+  if [ $1 == "200" ]
   then
     let "vard+=1"
-    Diretorios+=($palavra)
+    Diretorios+=($2)
   fi
+}
 
-  if [ $arquivo == "200" ]
+inserindo_arquivos() {
+  if [ $1 == "200" ]
   then
     let "vara+=1"
-    Arquivos+=($palavra.$2)
+    Arquivos+=($2)
   fi
-done
+}
+
+main() {
+for palavra in $(cat listateste.txt)
+do
+
+  if [ $1 == "ad" ]
+  then
+    echo -en "\r${green}Diretórios encontrados:${nc} ${red}$vard${nc} ${green}Arquivos encontrados:${nc} ${red}$vara${nc}"
+    diretorio=$(curl -s -H "User-Agent: elzio" -o /dev/null -w "%{http_code}" http://$2/$palavra/)
+    arquivo=$(curl -s -H "User-Agent: elzio" -o /dev/null -w "%{http_code}" http://$2/$palavra.$3)
+
+    inserindo_diretorios $diretorio $palavra
+    inserindo_arquivos $arquivo $palavra.$3
+  fi
+
+  if [ $1 == "d" ]  
+  then
+    echo -en "\r${green}Diretórios encontrados:${nc} ${red}$vard${nc}"
+    diretorio=$(curl -s -H "User-Agent: elzio" -o /dev/null -w "%{http_code}" http://$2/$palavra/)
+    inserindo_diretorios $diretorio $palavra
+  fi
+
+  if [ $1 == "a" ] 
+  then
+    echo -en "\r${green}Arquivos encontrados:${nc} ${red}$vara${nc}"
+    arquivo=$(curl -s -H "User-Agent: elzio" -o /dev/null -w "%{http_code}" http://$2/$palavra.$3)
+    inserindo_arquivos $arquivo $palavra.$3
+  fi
+  
+ done
 
 if [ ! -z "$Diretorios" ]
 then
-  exibir_resultado $1 Diretorios
+  exibir_resultado $2 Diretorios
 fi
 
 if [ ! -z "$Arquivos" ]
 then
-  exibir_resultado $1 Arquivos
+  exibir_resultado $2 Arquivos
 fi
+}
+
+main $@
