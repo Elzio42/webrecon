@@ -20,3 +20,6 @@ arquivos
 img
 upload
 cadastro
+update
+var
+var/bkp/
