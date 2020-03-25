@@ -21,7 +21,7 @@ done
 }
 
 
-for palavra in $(cat listateste.txt)
+for palavra in $(cat claudio.txt)
 do
   echo -en "\r${green}Diretórios encontrados:${nc} ${red}$vard${nc} ${green}Arquivos encontrados:${nc} ${red}$vara${nc}"
   diretorio=$(curl -s -H "User-Agent: elzio" -o /dev/null -w "%{http_code}" http://$1/$palavra/)
